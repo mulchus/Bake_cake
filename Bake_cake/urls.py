@@ -21,7 +21,7 @@ from cakecartapp import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('1/', views.html_button, name='htmlbutton'),
     path("", views.index),
-    path("postuser/", views.postuser),
-
+    path("postorder/", views.postorder),
 ]
