@@ -1,47 +1,45 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from .forms import TableForm
-
-
-def html_button(request):
-    if request.method == "POST":
-        form = TableForm(request.POST)
-        if form.is_valid():
-            num = form.cleaned_data['num']
-            return render(request, 'home.html', {'Number': num, 'range': range(1,11)})
-    else:
-        form = TableForm()
-    return render(request, 'home.html', {'form': form})
+from .models import Levels, Form, Topping, Berries, Decoration
 
 
 # Create your views here.
 def index(request):
-    if request.method == "POST":
-        print(request.POST.getlist)
-        form_id = request.POST.get('form')
-        print(form_id)
-    else:
-        form_id = ''
-    return render(request, "index.html", {'Cost': form_id})
+    return render(request, "index.html")
 
 
-def postorder(request):
-    # получаем из строки запроса имя пользователя
-    # print(request.POST.getlist)
-    lvls = request.POST.get("lvls")
-    form = request.POST.get("form")
-    topping = request.POST.get("topping")
-    berries = request.POST.get("berries")
-    decor = request.POST.get("decor")
+def order(request):
+    berries_id = request.POST.get("berries")
+    decor_id = request.POST.get("decor")
     words = request.POST.get("words")
     comment = request.POST.get("comment")
 
-    return HttpResponse(f"""
-                <div>Количество уровней: {lvls}</div>  
-                <div>Форма: {form}<div>
-                <div>Топпинг: {topping}</div>
-                <div>Ягоды: {berries}</div>
-                <div>Декор: {decor}</div>
-                <div>Надпись: {words}</div>
-                <div>Комментарий к заказу: {comment}</div>                
-            """)
+    berries_name = ''
+    decor_name = ''
+    cost = 0
+
+    levels = Levels.objects.get(pk=int(request.POST.get("lvls")))
+    form = Form.objects.get(pk=int(request.POST.get("form")))
+    topping = Topping.objects.get(pk=int(request.POST.get("topping")))
+    cost += (levels.price + form.price + topping.price)
+    if berries_id:
+        berries = Berries.objects.get(pk=int(berries_id))
+        berries_name = berries.name
+        cost += berries.price
+    if decor_id:
+        decor = Decoration.objects.get(pk=int(decor_id))
+        decor_name = decor.name
+        cost += decor.price
+
+    cake = {
+        'levels': levels.quantity,
+        'form': form.name,
+        'topping': topping.name,
+        'berries': berries_name,
+        'decor': decor_name,
+        'words': words,
+        'comment': comment,
+        'cost': cost,
+    }
+    return render(request, "order.html", context=cake)
