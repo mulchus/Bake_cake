@@ -1,3 +1,6 @@
 Django==4.2.3
 requests==2.31.0
 environs==9.5.0
+django-phonenumber-field==7.1.*
+django-phonenumbers==1.0.*
+pillow==10.0.*
