@@ -16,6 +16,7 @@ def index(request):
         'berries': Berries.objects.all(),
         'decors': Decoration.objects.all(),
     }
+    print(cake_elements)
     return render(request, "index.html", context=cake_elements)
 
 
