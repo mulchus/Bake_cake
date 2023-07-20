@@ -33,7 +33,6 @@ class Topping(models.Model):
 
 class Levels(models.Model):
     quantity = models.IntegerField('Количество',
-                                   choices=[(1, 1), (2, 2), (3, 3)],
                                    default=1)
     price = models.IntegerField('Цена',
                                 default=0,
@@ -42,7 +41,7 @@ class Levels(models.Model):
                                     MaxValueValidator(1000000),
                                 ])
     def __str__(self):
-        return f'{self.quantity}: {self.price} р.'
+        return f'кол-во {self.quantity}: {self.price} р.'
 
 
 class Berries(models.Model):
