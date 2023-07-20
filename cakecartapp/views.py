@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from .forms import TableForm
 from .models import Levels, Form, Topping, Berries, Decoration, Order, Cake, Client
 from datetime import datetime
 
@@ -15,9 +14,8 @@ def index(request):
         'forms': Form.objects.all(),
         'toppings': Topping.objects.all(),
         'berries': Berries.objects.all(),
-        'decorations': Decoration.objects.all(),
+        'decors': Decoration.objects.all(),
     }
-
     return render(request, "index.html", context=cake_elements)
 
 
