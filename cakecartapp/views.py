@@ -10,7 +10,15 @@ CAKE = {}
 
 # Create your views here.
 def index(request):
-    return render(request, "index.html")
+    cake_elements = {
+        'levels': Levels.objects.all(),
+        'forms': Form.objects.all(),
+        'toppings': Topping.objects.all(),
+        'berries': Berries.objects.all(),
+        'decorations': Decoration.objects.all(),
+    }
+
+    return render(request, "index.html", context=cake_elements)
 
 
 def making_order(request):      # Сохраняем торт и заказ {CAKE}
