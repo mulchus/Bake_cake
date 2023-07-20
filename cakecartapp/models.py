@@ -123,6 +123,12 @@ class Cake(models.Model):
                                    null=True,
                                    related_name='cakes',
                                    verbose_name='Декор')
+    price = models.IntegerField('Цена',
+                                default=0,
+                                validators=[
+                                    MinValueValidator(0),
+                                    MaxValueValidator(1000000),
+                                ])
 
     def __str__(self):
         return f'{self.id}. {self.name} {self.category}'
@@ -169,6 +175,12 @@ class Order(models.Model):
                               max_length=100)
     courier_comment = models.TextField('Комментарий для курьера',
                                        blank=True)
+    cost = models.IntegerField('Стоимость',
+                                default=0,
+                                validators=[
+                                    MinValueValidator(0),
+                                    MaxValueValidator(1000000),
+                                ])
 
     def __str__(self):
         return f'{self.id} {self.client.name} {self.delivery_date_time}'

@@ -5,7 +5,8 @@
 	<div class="container mt-header">
 		<article id="VueApp">
 			<section class="row pt-header" id="step4">
-				<v-form :validation-schema="schema2" @submit="this.$refs.HiddenFormSubmit.click()">
+				<v-form :validation-schema="schema2" method="post" action="../pay/">
+					{% csrf_token %}
 					<div class="col">
 						<div class="d-flex flex-column position-relative pb-5">
 							<h2 class="fs_40 font_Gogh cake_blue text-center align-self-center">Оформление заказа</h2>
@@ -51,12 +52,16 @@
 									</ul>
 									<span>Надпись:
 										{% if not words %}
-											'Без надписи'
+											без надписи
 										{% else %}
 											{{ words }}
 										{% endif %}
 									</span>
-									<span>Комментарий: {{ comment }}</span>
+									<span>
+										{% if comment %}
+											'Комментарий: {{ comment }}'
+										{% endif %}
+									</span>
 								</div>
 							</div>
 						</div>
@@ -84,7 +89,7 @@
 						<div class="row mt-3">
 							<div class="col-12 col-md-6">
 								<label for="deliv-comment" class="cake_blue">Комментарий для курьера</label>
-								<textarea v-model="DelivComments" :class="DelivComments ? 'cake__border_blue': ''" id="deliv-comment" class="form-control cake__textinput mt-3" rows="2" style="resize: none"></textarea>
+								<textarea v-model="DelivComments" :class="DelivComments ? 'cake__border_blue': ''" name="deliv-comment" id="deliv-comment" class="form-control cake__textinput mt-3" rows="2" style="resize: none"></textarea>
 							</div>
 							<div class="col-12 col-md-6 d-flex flex-column align-items-center align-items-md-end mt-3 mt-md-0">
 								<div class="d-flex">
