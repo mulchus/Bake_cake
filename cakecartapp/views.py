@@ -3,7 +3,6 @@ from django.http import HttpResponse
 from .models import Levels, Form, Topping, Berries, Decoration, Order, Cake, Client
 from datetime import datetime
 
-
 CAKE = {}
 
 
@@ -19,7 +18,7 @@ def index(request):
     return render(request, "index.html", context=cake_elements)
 
 
-def making_order(request):      # Сохраняем торт и заказ {CAKE}
+def pay(request):  # Сохраняем торт и заказ {CAKE}
     global CAKE
 
     try:
@@ -35,12 +34,10 @@ def making_order(request):      # Сохраняем торт и заказ {CAK
     except ValueError as error:
         return HttpResponse(f"Ошибка сохранения торта, {error}", content_type="text/plain")  # , charset="utf-8")
 
-    delivery_date_time = datetime.strptime(f"{CAKE['date']} {CAKE['time']}", "%Y-%m-%d %H:%M").isoformat()
-
     try:
         client, created = Client.objects.get_or_create(
-            phone_number=CAKE['phone'],
-            defaults={'email': CAKE['email'], 'name': CAKE['email']},
+            phone_number=request.POST.get('phone_format'),
+            defaults={'email': request.POST.get('email_format'), 'name': request.POST.get('name_format')},
         )
     except ValueError as error:
         return HttpResponse(f"Ошибка сохранения клиента {error}", content_type="text/plain")  # , charset="utf-8")
@@ -50,7 +47,7 @@ def making_order(request):      # Сохраняем торт и заказ {CAK
             client=client,
             comment=CAKE['comment'],
             address=CAKE['address'],
-            delivery_date_time=delivery_date_time,
+            delivery_date_time=CAKE['delivery_date_time'].isoformat(),
             status='TBA',
             courier_comment=CAKE['courier_comment'],
             cost=CAKE['cost'],
@@ -60,25 +57,10 @@ def making_order(request):      # Сохраняем торт и заказ {CAK
         return HttpResponse(f"Ошибка сохранения заказа {error}", content_type="text/plain")  # , charset="utf-8")
 
     CAKE.clear()
-    return render(request, "making_order.html")
+    return render(request, "pay.html")
 
 
-def pay(request):   # отображаем заказ на странице ввода данных клиента и оплаты
-    global CAKE
-    CAKE.update(
-        {'name': request.POST.get('name_format'),
-         'phone': request.POST.get('phone_format'),
-         'email': request.POST.get('email_format'),
-         'address': request.POST.get('address'),
-         'date': request.POST.get('date'),
-         'time': request.POST.get('time'),
-         'courier_comment': request.POST.get('deliv-comment'),
-        }
-    )
-    return render(request, "pay.html", context=CAKE)
-
-
-def order(request):     # отображаем заказ на странице ввода данных клиента
+def order(request):  # отображаем заказ на странице ввода данных клиента
     global CAKE
     berries_id = request.POST.get("berries")
     decor_id = request.POST.get("decor")
@@ -105,6 +87,13 @@ def order(request):     # отображаем заказ на странице 
         decor_name = decor.name
         cost += decor.price
 
+    delivery_date_time = datetime.strptime(f"{request.POST.get('date')} {request.POST.get('time')}", "%Y-%m-%d %H:%M")
+    difference = (delivery_date_time - datetime.now()).seconds / 3600
+    print(difference, cost)
+    if difference < 24:
+        cost *= 1.2
+        print(cost)
+
     CAKE = {
         'levels': levels.quantity,
         'levels_pk': levels.pk,
@@ -118,6 +107,9 @@ def order(request):     # отображаем заказ на странице 
         'decor_pk': decor_id,
         'words': words,
         'comment': comment,
+        'address': request.POST.get('address'),
+        'delivery_date_time': delivery_date_time,
+        'courier_comment': request.POST.get('deliv-comment'),
         'cost': cost,
     }
     return render(request, "order.html", context=CAKE)

@@ -5,13 +5,17 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 class Form(models.Model):
     name = models.CharField('Название',
-                            max_length=200,)
+                            max_length=200, )
     price = models.IntegerField('Цена',
                                 default=0,
                                 validators=[
                                     MinValueValidator(0),
                                     MaxValueValidator(1000000),
                                 ])
+
+    class Meta:
+        verbose_name = 'Форма'
+        verbose_name_plural = 'Формы'
 
     def __str__(self):
         return f'{self.name}: {self.price} р.'
@@ -27,6 +31,10 @@ class Topping(models.Model):
                                     MaxValueValidator(1000000),
                                 ])
 
+    class Meta:
+        verbose_name = 'Топпинг'
+        verbose_name_plural = 'Топпинги'
+
     def __str__(self):
         return f'{self.name}: {self.price} р.'
 
@@ -40,6 +48,11 @@ class Levels(models.Model):
                                     MinValueValidator(0),
                                     MaxValueValidator(1000000),
                                 ])
+
+    class Meta:
+        verbose_name = 'Уровней'
+        verbose_name_plural = 'Уровни'
+
     def __str__(self):
         return f'кол-во {self.quantity}: {self.price} р.'
 
@@ -54,6 +67,10 @@ class Berries(models.Model):
                                     MaxValueValidator(1000000),
                                 ])
 
+    class Meta:
+        verbose_name = 'Ягода'
+        verbose_name_plural = 'Ягоды'
+
     def __str__(self):
         return f'{self.name}: {self.price} р.'
 
@@ -67,6 +84,10 @@ class Decoration(models.Model):
                                     MinValueValidator(0),
                                     MaxValueValidator(1000000),
                                 ])
+
+    class Meta:
+        verbose_name = 'Декор'
+        verbose_name_plural = 'Декоры'
 
     def __str__(self):
         return f'{self.name}: {self.price} р.'
@@ -129,6 +150,10 @@ class Cake(models.Model):
                                     MaxValueValidator(1000000),
                                 ])
 
+    class Meta:
+        verbose_name = 'Торт'
+        verbose_name_plural = 'Торты'
+
     def __str__(self):
         return f'{self.id}. {self.name} {self.category}'
 
@@ -142,6 +167,10 @@ class Client(models.Model):
                                     region='RU',
                                     max_length=20,
                                     unique=True)
+
+    class Meta:
+        verbose_name = 'Клиент'
+        verbose_name_plural = 'Клиенты'
 
     def __str__(self):
         return f'{self.name} {self.phone_number}'
@@ -175,12 +204,15 @@ class Order(models.Model):
     courier_comment = models.TextField('Комментарий для курьера',
                                        blank=True)
     cost = models.IntegerField('Стоимость',
-                                default=0,
-                                validators=[
-                                    MinValueValidator(0),
-                                    MaxValueValidator(1000000),
-                                ])
+                               default=0,
+                               validators=[
+                                   MinValueValidator(0),
+                                   MaxValueValidator(1000000),
+                               ])
+
+    class Meta:
+        verbose_name = 'Заказ'
+        verbose_name_plural = 'Заказы'
 
     def __str__(self):
         return f'{self.id} {self.client.name} {self.delivery_date_time}'
-

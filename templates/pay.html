@@ -5,38 +5,16 @@
 	<div class="container mt-header">
 		<article id="VueApp">
 			<section class="row pt-header" id="step4">
-				<v-form method="post" action="../making_order/">
-					{% csrf_token %}
+				<form action="{% url 'index_view' %}" method="get">
 					<div class="col">
 						<div class="d-flex flex-column position-relative pb-5">
-							<h2 class="fs_40 font_Gogh cake_blue text-center align-self-center">Оплата заказа</h2>
-							<p class="my-1 fs_30 cake_blue">Уровней: {{ levels }}</p>
-							<p class="my-1 fs_30 cake_blue">Форма: {{ form }}</p>
-							<p class="my-1 fs_30 cake_blue">Топпинг: {{ topping }}</p>
-							<p class="my-1 fs_30 cake_blue">Ягоды: {{ berries }}</p>
-							<p class="my-1 fs_30 cake_blue">Декор: {{ decor }}</p>
-							<p class="my-1 fs_30 cake_blue">Надпись: {{ words }}</p>
-							<p class="my-1 fs_30 cake_blue">Комментарий к заказу: {{ comment }}</p>
-							<hr />
-							<p class="my-1 fs_30 cake_blue">Имя: {{ name }}</p>
-							<p class="my-1 fs_30 cake_blue">Телефон: {{ phone }}</p>
-							<p class="my-1 fs_30 cake_blue">Почта: {{ email }}</p>
-							<p class="my-1 fs_30 cake_blue">Адрес доставки: {{ address }}</p>
-							<p class="my-1 fs_30 cake_blue">Дата доставки: {{ date }}</p>
-							<p class="my-1 fs_30 cake_blue">Время доставки: {{ time }}</p>
-							<p class="my-1 fs_30 cake_blue">Комментарий для курьера: {{ courier_comment }}</p>
-							<hr />
-						</div>
-						<div class="row mt-3">
-							<div class="col-12 col-md-6 d-flex flex-column align-items-center align-items-md-end mt-3 mt-md-0">
-								<div class="d-flex">
-									<span class="cake_pink fs_40 fw-bold me-2">Итого: {{ cost }}₽</span>
-								</div>
-								<button type="submit" class="btn btn_hover text-white rounded-pill mt-3 px-5 shadow-none cake__button cake__bg_pink">Оплатить</button>
-							</div>
+							<h2 class="fs_40 font_Gogh cake_blue text-center align-self-center">Спасибо за заказ!</h2>
+							<button type="submit" class="btn text-white rounded-pill mt-3 shadow-none cake__button cake__bg_pink">На главную
+<!--								<a href="{% url 'index_view' %}" class="btn text-white rounded-pill mt-3 shadow-none cake__button cake__bg_pink">На главную</a>-->
+							</button>
 						</div>
 					</div>
-				</v-form>
+				<form>
 			</section>
 		</article>
 	</div>
