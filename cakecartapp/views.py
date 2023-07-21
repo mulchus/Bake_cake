@@ -1,9 +1,13 @@
+import hashlib
+
 from django.shortcuts import render
 from django.http import HttpResponse
 from .models import Levels, Form, Topping, Berries, Decoration, Order, Cake, Client
 from datetime import datetime
+from decimal import Decimal
 
 CAKE = {}
+PASSWORD = 'sC8rkSYhE8MS8NN85FQm'
 
 
 # Create your views here.
@@ -93,6 +97,9 @@ def order(request):  # отображаем заказ на странице в�
     if difference < 24:
         cost *= 1.2
         print(cost)
+    dec_cost = Decimal(cost)
+    crc = f'tortiru:{cost}::{PASSWORD}'
+    signature = hashlib.md5(crc.encode())
 
     CAKE = {
         'levels': levels.quantity,
@@ -111,5 +118,6 @@ def order(request):  # отображаем заказ на странице в�
         'delivery_date_time': delivery_date_time,
         'courier_comment': request.POST.get('deliv-comment'),
         'cost': cost,
+        'signature': signature,
     }
     return render(request, "order.html", context=CAKE)
