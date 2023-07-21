@@ -24,5 +24,4 @@ urlpatterns = [
     path("", views.index, name='index_view'),
     path("order/", views.order),
     path("pay/", views.pay),
-    path("making_order/", views.making_order),
 ]

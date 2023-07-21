@@ -25,8 +25,28 @@ Vue.createApp({
                         return true;
                     }
                     return ' топпинг';
-                }
+                },
+
+                address: (value) => {
+                    if (value) {
+                        return true;
+                    }
+                    return ' адрес';
+                },
+                date: (value) => {
+                    if (value) {
+                        return true;
+                    }
+                    return ' дату доставки';
+                },
+                time: (value) => {
+                    if (value) {
+                        return true;
+                    }
+                    return ' время доставки';
+                },
             },
+
             schema2: {
                 name: (value) => {
                     if (value) {
@@ -79,24 +99,7 @@ Vue.createApp({
                     }
                     return ' почту';
                 },
-                address: (value) => {
-                    if (value) {
-                        return true;
-                    }
-                    return ' адрес';
-                },
-                date: (value) => {
-                    if (value) {
-                        return true;
-                    }
-                    return ' дату доставки';
-                },
-                time: (value) => {
-                    if (value) {
-                        return true;
-                    }
-                    return ' время доставки';
-                }
+
             },
             DATA: {
                 Levels: ['не выбрано', '1', '2', '3'],

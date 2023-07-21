@@ -10,6 +10,19 @@
 					<div class="col">
 						<div class="d-flex flex-column position-relative pb-5">
 							<h2 class="fs_40 font_Gogh cake_blue text-center align-self-center">Оформление заказа</h2>
+							<p class="my-1 fs_30 cake_blue">Уровней: {{ levels }}</p>
+							<p class="my-1 fs_30 cake_blue">Форма: {{ form }}</p>
+							<p class="my-1 fs_30 cake_blue">Топпинг: {{ topping }}</p>
+							<p class="my-1 fs_30 cake_blue">Ягоды: {{ berries }}</p>
+							<p class="my-1 fs_30 cake_blue">Декор: {{ decor }}</p>
+							<p class="my-1 fs_30 cake_blue">Надпись: {{ words }}</p>
+							<p class="my-1 fs_30 cake_blue">Комментарий к заказу: {{ comment }}</p>
+							<hr />
+							<p class="my-1 fs_30 cake_blue">Адрес доставки: {{ address }}</p>
+							<p class="my-1 fs_30 cake_blue">Дата и время доставки: {{ delivery_date_time|date:"l, d F y" }}</p>
+							<p class="my-1 fs_30 cake_blue">Комментарий для курьера: {{ courier_comment }}</p>
+							<hr />
+
 							<span class="cake_pink mt-2 position-absolute bottom-0">
 								<error-message name="name" class="from__alert"></error-message>
 								<error-message name="phone" class="from__alert"></error-message>
@@ -39,63 +52,14 @@
 									<error-message name="email_format" class="position-absolute bottom-0 cake_pink fs_12"></error-message>
 								</div>
 							</div>
-							<div class="col-12 col-lg-4 d-flex justify-content-center justify-content-lg-end">
-								<div class="cake__card p-4 position-relative cake_grey">
-									<span class="cake__badge rounded-pill">?</span>
-									<span>Количество уровней: {{ levels }}</span>
-									<span>Форма уровней: {{ form }}</span>
-									<p>Топинг: {{ topping }}</p>
-									<span>Дополнительно:</span>
-									<ul>
-										<li>Ягоды: {{ berries }}</li>
-										<li>Декор: {{ decor }}</li>
-									</ul>
-									<span>Надпись:
-										{% if not words %}
-											без надписи
-										{% else %}
-											{{ words }}
-										{% endif %}
-									</span>
-									<span>
-										{% if comment %}
-											'Комментарий: {{ comment }}'
-										{% endif %}
-									</span>
-								</div>
-							</div>
-						</div>
-						<div class="d-flex flex-column position-relative pb-4">
-							<h2 class="fs_40 cake_pink">Данные для доставки</h2>
-							<span class="cake_pink mt-2 position-absolute bottom-0">
-								<error-message name="address" class="from__alert"></error-message>
-								<error-message name="date" class="from__alert"></error-message>
-								<error-message name="time" class="from__alert"></error-message>
-							</span>
 						</div>
 
-						<div class="row">
-							<div class="col-6 col-lg-4 d-flex flex-column">
-								<label for="address" class="my-1 fs_40 cake_blue">Адрес</label>
-								<label for="date" class="my-1 fs_40 cake_blue">Дата</label>
-								<label for="time" class="my-1 fs_40 cake_blue">Время</label>
-							</div>
-							<div class="col-6 col-lg-4 d-flex flex-column">
-								<v-field v-model="Address" :class="Address ? 'cake__border_blue': ''" type="text" name="address" id="address" placeholder="Введите ваш адрес" class="form-control my-3 cake__textinput"></v-field>
-								<v-field v-model="Dates" :class="Dates ? 'cake__border_blue': ''" type="date" name="date" id="date" placeholder="ДД.ММ.ГГ" class="form-control my-3 cake__textinput"></v-field>
-								<v-field v-model="Time" :class="Time ? 'cake__border_blue': ''" type="time" name="time" id="time" placeholder="00:00" class="form-control my-3 cake__textinput"></v-field>
-							</div>
-						</div>
 						<div class="row mt-3">
-							<div class="col-12 col-md-6">
-								<label for="deliv-comment" class="cake_blue">Комментарий для курьера</label>
-								<textarea v-model="DelivComments" :class="DelivComments ? 'cake__border_blue': ''" name="deliv-comment" id="deliv-comment" class="form-control cake__textinput mt-3" rows="2" style="resize: none"></textarea>
-							</div>
 							<div class="col-12 col-md-6 d-flex flex-column align-items-center align-items-md-end mt-3 mt-md-0">
 								<div class="d-flex">
 									<span class="cake_pink fs_40 fw-bold me-2">Итого: {{ cost }}₽</span>
 								</div>
-								<button type="submit" class="btn btn_hover text-white rounded-pill mt-3 px-5 shadow-none cake__button cake__bg_pink">К оплате</button>
+								<button type="submit" class="btn btn_hover text-white rounded-pill mt-3 px-5 shadow-none cake__button cake__bg_pink">Оплатить</button>
 							</div>
 						</div>
 					</div>
