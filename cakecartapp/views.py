@@ -10,7 +10,67 @@ CAKE = {}
 PASSWORD = 'sC8rkSYhE8MS8NN85FQm'
 
 
-# Create your views here.
+def catalog_pay(request):  # Сохраняем торты и заказ {CAKE}
+    global CAKE
+    cakes = CAKE['selected_cakes']
+    try:
+        client, created = Client.objects.get_or_create(
+            phone_number=request.POST.get('phone_format'),
+            defaults={'email': request.POST.get('email_format'), 'name': request.POST.get('name_format')},
+        )
+    except ValueError as error:
+        return HttpResponse(f"Ошибка сохранения клиента {error}", content_type="text/plain")
+
+    delivery_date_time = datetime.strptime(f"{request.POST.get('date')} {request.POST.get('time')}", "%Y-%m-%d %H:%M")
+
+    try:
+        new_order = Order.objects.create(
+            client=client,
+            address=request.POST.get('address'),
+            delivery_date_time=delivery_date_time.isoformat(),
+            status='TBA',
+            comment=request.POST.get('comment'),
+            courier_comment=request.POST.get('deliv-comment'),
+            cost=CAKE['cost'],
+        )
+        new_order.cake.add(*(list(cakes)))
+    except ValueError as error:
+        return HttpResponse(f"Ошибка сохранения заказа {error}", content_type="text/plain")
+
+    CAKE.clear()
+    return render(request, "catalog_pay.html")
+
+
+def catalog_order(request):
+    global CAKE
+    selected_cakes = Cake.objects.filter(pk__in=request.POST.getlist('selected_cakes'))
+
+    cost = sum([cake.price for cake in selected_cakes])
+
+    context = {
+        'selected_cakes': selected_cakes,
+        'cost': cost,
+    }
+    CAKE = context
+    return render(request, "catalog_order.html", context=context)
+
+
+def catalog(request):
+    category = request.GET.get('category', '')
+    if category:
+        context = {
+            'catalog_of_cakes': Cake.objects.filter(category__exact=category),
+            'category': (dict(Cake.Categories.choices))[category]
+        }
+    else:
+        context = {
+            'catalog_of_cakes': Cake.objects.exclude(category__exact='CUSTOM'),
+            'category': 'Все категории',
+        }
+
+    return render(request, "catalog.html", context=context)
+
+
 def index(request):
     cake_elements = {
         'levels': Levels.objects.all(),
@@ -36,7 +96,7 @@ def pay(request):  # Сохраняем торт и заказ {CAKE}
             price=CAKE['cost'],
         )
     except ValueError as error:
-        return HttpResponse(f"Ошибка сохранения торта, {error}", content_type="text/plain")  # , charset="utf-8")
+        return HttpResponse(f"Ошибка сохранения торта, {error}", content_type="text/plain")
 
     try:
         client, created = Client.objects.get_or_create(
@@ -44,7 +104,7 @@ def pay(request):  # Сохраняем торт и заказ {CAKE}
             defaults={'email': request.POST.get('email_format'), 'name': request.POST.get('name_format')},
         )
     except ValueError as error:
-        return HttpResponse(f"Ошибка сохранения клиента {error}", content_type="text/plain")  # , charset="utf-8")
+        return HttpResponse(f"Ошибка сохранения клиента {error}", content_type="text/plain")
 
     try:
         new_order = Order.objects.create(
@@ -58,7 +118,7 @@ def pay(request):  # Сохраняем торт и заказ {CAKE}
         )
         new_order.cake.add(new_cake)
     except ValueError as error:
-        return HttpResponse(f"Ошибка сохранения заказа {error}", content_type="text/plain")  # , charset="utf-8")
+        return HttpResponse(f"Ошибка сохранения заказа {error}", content_type="text/plain")
 
     CAKE.clear()
     return render(request, "pay.html")
