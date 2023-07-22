@@ -60,7 +60,7 @@
 								<div class="d-flex">
 									<span class="cake_pink fs_40 fw-bold me-2">Итого: {{ cost }}₽</span>
 								</div>
-								<button type="submit" class="btn btn_hover text-white rounded-pill mt-3 px-5 shadow-none cake__button cake__bg_pink">Оплатить</button>
+								<button onclick="window.location.href='https://auth.robokassa.ru/Merchant/Index.aspx?MerchantLogin=tortiru&Culture=ru&Encoding=utf-8&OutSum={{ cost }}&shp_interface=link&SignatureValue={{ signature }}';" type="submit" class="btn btn_hover text-white rounded-pill mt-3 px-5 shadow-none cake__button cake__bg_pink">Оплатить</button>
 							</div>
 						</div>
 					</div>

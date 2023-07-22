@@ -1,11 +1,13 @@
+import hashlib
+
 from django.shortcuts import render
 from django.http import HttpResponse
 from .models import Levels, Form, Topping, Berries, Decoration, Order, Cake, Client
 from datetime import datetime
 from decimal import Decimal
 
-
 CAKE = {}
+PASSWORD = 'sC8rkSYhE8MS8NN85FQm'
 
 
 def catalog_pay(request):  # Сохраняем торты и заказ {CAKE}
@@ -151,6 +153,7 @@ def order(request):  # отображаем заказ на странице в�
 
     delivery_date_time = datetime.strptime(f"{request.POST.get('date')} {request.POST.get('time')}", "%Y-%m-%d %H:%M")
     difference = (delivery_date_time - datetime.now()).seconds / 3600
+    print(difference, cost)
     if difference < 24:
         cost *= 1.2
         print(cost)
@@ -175,5 +178,6 @@ def order(request):  # отображаем заказ на странице в�
         'delivery_date_time': delivery_date_time,
         'courier_comment': request.POST.get('deliv-comment'),
         'cost': cost,
+        'signature': signature,
     }
     return render(request, "order.html", context=CAKE)
