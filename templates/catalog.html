@@ -1,0 +1,45 @@
+{% load static %}
+{% include "header.html" %}
+
+<main>
+	<div class="container mt-header">
+		<article class="row pt-header text-center d-flex justify-content-center">
+			<h2 class="font_Gogh fs_40 cake_blue text-center mb-5">{{ category }}</h2>
+			<form class="row pt-header text-center d-flex justify-content-center" method="post" action="{% url 'catalog_order' %}">
+				{% csrf_token %}
+				{% for cake in catalog_of_cakes %}
+				<div class="col-12 col-sm-6 col-lg-4 mb-5 d-flex flex-column align-items-center">
+					<div class="card border-0 cake__hover">
+						{% if cake.image %}
+							<img src="{{ cake.image.url }}" alt="{{ cake.name }}" width="256" >
+						{% endif %}
+					</div>
+					<span class="cake_blue mt-4 fw-lighter">{{ cake.name }}</span>
+					<div class="align-items-left">
+						<span class="cake_grey fw-lighter">уровней: {{ cake.levels.quantity }},<br /></span>
+						<span class="cake_grey fw-lighter">форма: {{ cake.form.name|lower }},<br /></span>
+						<span class="cake_grey fw-lighter">nоппинг: {{ cake.topping.name|lower }},<br /></span>
+						<span class="cake_grey fw-lighter">ягоды: {{ cake.berries.name|lower }},<br /></span>
+						<span class="cake_grey fw-lighter">декор: {{ cake.decoration.name|lower }}.<br /></span>
+					</div>
+					<span class="cake_grey fw-lighter">Цена: {{ cake.price }}</span>
+					<hr />
+					<p><input type="checkbox" name="selected_cakes" value="{{ cake.pk }}"> ВЫБРАТЬ</p>
+				</div>
+				{% endfor %}
+				<div class="d-flex justify-content-center">
+					<input type='submit' class="btn text-white rounded-pill mt-3 shadow-none cake__button cake__bg_pink" value='Оформить заказ'>
+				</div>
+			</form>
+		</article>
+
+	</div>
+</main>
+
+{% include "footer.html" %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+</body>
+
+</html>

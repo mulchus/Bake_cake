@@ -17,11 +17,16 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from cakecartapp import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("", views.index, name='index_view'),
-    path("order/", views.order),
-    path("pay/", views.pay),
-]
+    path("order/", views.order, name='order'),
+    path("pay/", views.pay, name='pay'),
+    path("catalog/", views.catalog, name='catalog'),
+    path("catalog_order/", views.catalog_order, name='catalog_order'),
+    path("catalog_pay/", views.catalog_pay, name='catalog_pay'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT, show_indexes=True)

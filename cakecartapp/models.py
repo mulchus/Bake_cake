@@ -157,6 +157,14 @@ class Cake(models.Model):
     def __str__(self):
         return f'{self.id}. {self.name} {self.category}'
 
+    # def admin_image(self):
+    #     return '<img src="%s"/>' % self.image
+    #
+    # def admin_image(self,obj):
+    #     return format_html(f'<img src="{0}" style="width: 45px; height:45px;" />'.format(obj.image.url))
+    #
+    # admin_image.allow_tags = True
+
 
 class Client(models.Model):
     name = models.CharField('Имя клиента',
