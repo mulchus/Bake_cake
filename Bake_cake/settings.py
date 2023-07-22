@@ -17,25 +17,36 @@ from environs import Env
 
 env = Env()
 env.read_env()
-# SECRET_KEY = env('SECRET_KEY')
-# DEBUG = env.bool('DEBUG', False)
-# ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', ['127.0.0.1', 'localhost'])
+
+SECRET_KEY = env('SECRET_KEY')
+
+# security.W018
+DEBUG = env.bool('DEBUG')
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', ['127.0.0.1', 'localhost'])
 # YANDEX_API_KEY = env('YANDEX_API_KEY')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# security.W004
+SECURE_HSTS_SECONDS = env.int('SECURE_HSTS_SECONDS')
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
+# security.W012
+SESSION_COOKIE_SECURE = env.bool('SESSION_COOKIE_SECURE')
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-^_^e)jqbsv-zg=d9=l_msbi#xzox^4snayo3#289f-yr(e1-$*'
+# security.W016
+CSRF_COOKIE_SECURE = env.bool('CSRF_COOKIE_SECURE')
+CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Another security settings
+SECURE_HSTS_PRELOAD = env.bool('SECURE_HSTS_PRELOAD')
+SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool('SECURE_HSTS_INCLUDE_SUBDOMAINS')
 
-ALLOWED_HOSTS = []
+# security.W008
+SECURE_SSL_REDIRECT = env.bool('SECURE_SSL_REDIRECT')
+SECURE_REDIRECT_EXEMPT = []
+for ALLOWED_HOST in ALLOWED_HOSTS:
+    SECURE_REDIRECT_EXEMPT.append(rf'{ALLOWED_HOST}|')
 
 
 # Application definition
@@ -131,14 +142,17 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATIC_ROOT = env.str('STATIC_ROOT')
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+MEDIA_URL = '/media/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
