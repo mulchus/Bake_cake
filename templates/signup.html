@@ -1,0 +1,69 @@
+{% load static %}
+{% include "header.html" %}
+
+
+
+<main>
+	<div class="container mt-header">
+        <aside class="modal fade" id="RegModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="RegModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content px-4 cake__modal">
+					<div class="modal-header border-0 pb-0 pt-4">
+						<button @click="Reset" type="button" class="btn-close border rounded-pill" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-header border-0 py-0">
+						<label for="reg" class="modal-title font_Gogh fs_40 cake_blue" id="RegModalLabel" >
+							<a href="{% url 'login' %}" class="modal-title font_Gogh fs_40 cake_blue">Вход</a> /
+							<a href="{% url 'signup' %}" class="modal-title font_Gogh fs_40 cake_blue">Регистрация</a>
+						</label>
+					</div>
+
+					<div class="modal-footer d-flex flex-column justify-content-between align-items-center text-center border-0 mx-5">
+						<p class="fs_12 cake_grey">
+							{# {{Step === `Number` ? `Нажимая на кнопку, вы соглашаетесь на обработку персональных данных в соответствии
+							с политикой конфиденциальности` : Step === 'Code' ? `Осталось времени: 05:00` : ``}} #}
+						</p>
+						<a href="#" v-if="Step === `Code`" @click.prevent="ToRegStep1" class="text-decoration-none cake_pink fs_12">изменить данные</a>
+					</div>
+				</div>
+			</div>
+		</aside>
+
+		<article id="VueApp">
+			<section class="row pt-header" id="step4">
+                        {% if form.errors %}
+  <div class="alert alert-warning alert-dismissible fade show" role="alert">
+      {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+{% endif %}
+                          {% block title %}Зарегистрироваться{% endblock %}
+                          {% block content %}
+                            <form method="post" action="{% url 'signup' %}">
+                              {% csrf_token %}
+<!--								{{ form.username.label_tag }}-->
+                              {{ form.as_p }}
+                              <input type="submit" value="Зарегистрироваться">
+                            </form>
+                          {% endblock %}
+					</div>
+			</section>
+		</article>
+	</div>
+</main>
+
+{% include "footer.html" %}
+
+<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>-->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script src="{% static 'index.js' %}"></script>
+<script src="{% static 'registration.js' %}"></script>
+
+</body>
+
+</html>

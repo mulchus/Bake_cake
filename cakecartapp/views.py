@@ -1,14 +1,70 @@
 import hashlib
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .models import Levels, Form, Topping, Berries, Decoration, Order, Cake, Client
+from django.views.generic import CreateView
+from django.urls import reverse_lazy
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+
 from datetime import datetime
 from decimal import Decimal
+
+from .forms import CreationForm
+from .models import Levels, Form, Topping, Berries, Decoration, Order, Cake, Client
+
 
 CAKE = {}
 PASSWORD = 'sC8rkSYhE8MS8NN85FQm'
 
+def lk(request):
+    client = Client.objects.get(user=request.user)
+
+    orders = client.orders.all()
+    context = {
+        'name': client.name,
+        'phone_number': client.phone_number,
+        'email': client.email,
+        'orders': orders,
+    }
+    return render(request, 'lk.html', context=context)
+
+def login_user(request):
+    if request.method == 'POST':
+        username = request.POST["username"]
+        password = request.POST["password"]
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            redirect('index_view')
+        else:
+            messages.success(request, ('Возникла ошибка. Попробуйте ещё раз.'))
+            redirect('login')
+    else:
+        return(request, 'registration/login.html')
+
+def signup(request):
+    form = CreationForm(request.POST)
+    if form.is_valid():
+        new_user = form.save()
+        Client.objects.create(
+            user=new_user,
+            name=form.cleaned_data['client_name'],
+            email=form.cleaned_data['email'],
+            phone_number=form.cleaned_data['phone_number'],)
+        # login(request.user)
+        messages.success(request, 'Вы успешно зарегистрировались!')
+        return redirect('index_view')
+    else:
+            # messages.success(request, 'Данный логин уже занят')
+        form = CreationForm()
+
+    context = {'form': form}
+    return render(request, 'signup.html', context)
+
+def logout_user(request):
+    logout(request)
+    return redirect('index_view')
 
 def catalog_pay(request):  # Сохраняем торты и заказ {CAKE}
     global CAKE
