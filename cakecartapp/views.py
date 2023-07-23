@@ -47,12 +47,15 @@ def signup(request):
     form = CreationForm(request.POST)
     if form.is_valid():
         new_user = form.save()
+        username = form.cleaned_data['username']
+        password = form.cleaned_data['password1']
         Client.objects.create(
             user=new_user,
             name=form.cleaned_data['client_name'],
             email=form.cleaned_data['email'],
             phone_number=form.cleaned_data['phone_number'],)
-        # login(request.user)
+        user = authenticate(username=username, password=password)
+        login(request, user)
         messages.success(request, 'Вы успешно зарегистрировались!')
         return redirect('index_view')
     else:
