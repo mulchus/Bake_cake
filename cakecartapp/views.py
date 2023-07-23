@@ -19,7 +19,7 @@ from .models import Levels, Form, Topping, Berries, Decoration, Order, Cake, Cli
 CAKE = {}
 PASSWORD = 'MzMJb6YTy03wLySB36bW'
 
-def send_email_with_pass():
+def send_email_with_pass(email, password):
     pass
 
 
@@ -66,7 +66,7 @@ def signup(request):
         messages.success(request, 'Вы успешно зарегистрировались!')
         return redirect('index_view')
     else:
-            # messages.success(request, 'Данный логин уже занят')
+        # messages.success(request, 'Данный логин уже занят')
         form = CreationForm()
 
     context = {'form': form}
@@ -165,8 +165,7 @@ def pay(request):  # Сохраняем торт и заказ {CAKE}
         )
     except ValueError as error:
         return HttpResponse(f"Ошибка сохранения торта, {error}", content_type="text/plain")
-
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         try:
             client = Client.objects.get(user=request.user)
         except ObjectDoesNotExist as error:
@@ -174,30 +173,34 @@ def pay(request):  # Сохраняем торт и заказ {CAKE}
         except MultipleObjectsReturned as error:
             return HttpResponse(f"По данному пользователю зарегистрировано несколько клиентов: {error}", content_type="text/plain")
     else:
-        print(request.POST.get('phone_format'))
         serialized_phone = PhoneNumber.from_string(request.POST.get('phone_format'), region='RU').as_e164
         try:
             email = request.POST.get('email_format')
-            client, created = Client.objects.get_or_create(
-                phone_number=serialized_phone,
-                defaults={'email': email, 'name': request.POST.get('name_format')},
-            )
-            if created:
+            if Client.objects.filter(phone_number=serialized_phone).exists():
+                client = Client.objects.get(phone_number=serialized_phone)
+                # user = authenticate(username=client.user, password=client.user.password)
+                login(request, client.user)
+            else:
                 password = User.objects.make_random_password(length=9)
                 user = User.objects.create_user(
                     username=email,
-                    password1=password,
-                    password2=password,
-                    email=email,
-                )
-                send_email_with_pass(email, password)
-                client.user = user
-                client.save()
-            else:
-                pass
+                    password=password,
+                    email=email,)
 
+                client = Client.objects.create(
+                    phone_number=serialized_phone,
+                    email=email,
+                    name=request.POST.get('name_format'),
+                    user=user,)
+                send_email_with_pass(email, password)
+                user = authenticate(username=email, password=password)
+                login(request, user)
         except ValueError as error:
             return HttpResponse(f"Ошибка сохранения клиента {error}", content_type="text/plain")
+        except ObjectDoesNotExist as error:
+            return HttpResponse(f"Клиента по данному пользователю не существует: {error}", content_type="text/plain")
+        except MultipleObjectsReturned as error:
+            return HttpResponse(f"По данному пользователю зарегистрировано несколько клиентов: {error}", content_type="text/plain")
 
     try:
         new_order = Order.objects.create(
