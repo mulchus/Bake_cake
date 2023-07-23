@@ -104,9 +104,19 @@ def catalog_pay(request):  # Сохраняем торты и заказ {CAKE}
         new_order.cake.add(*(list(cakes)))
     except ValueError as error:
         return HttpResponse(f"Ошибка сохранения заказа {error}", content_type="text/plain")
+    cost = new_order.cost
+    crc = f'tortiru:{cost}::{PASSWORD}'
+    signature = hashlib.md5(crc.encode())
+    context = {
+        'address': new_order.address,
+        'phone': client.phone_number,
+        'email': client.email,
+        'cost': cost,
+        'signature': signature,
 
+    }
     CAKE.clear()
-    return render(request, "catalog_pay.html")
+    return render(request, "catalog_pay.html", context=context)
 
 
 def catalog_order(request):
@@ -189,11 +199,8 @@ def pay(request):  # Сохраняем торт и заказ {CAKE}
     except ValueError as error:
         return HttpResponse(f"Ошибка сохранения заказа {error}", content_type="text/plain")
     cost = new_order.cost
-    print(cost)
     crc = f'tortiru:{cost}::{PASSWORD}'
-    print(crc)
     signature = hashlib.md5(crc.encode())
-    print(signature)
     context = {
         'address': CAKE['address'],
         'delivery_date_time': CAKE['delivery_date_time'],
