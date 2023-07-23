@@ -67,7 +67,7 @@ class UserAdmin(BaseUserAdmin):
 
 @admin.register(Links)
 class LinksAdmin(DjangoObjectActions, admin.ModelAdmin):
-    list_display = ('long_link', 'short_link', 'views_number', )
+    list_display = ('name', 'long_link', 'short_link', 'views_number', )
 
     @action(label='Обновить ссылки', description='Обновить информацию по всем ссылкам в базе '
                                                  'и создать из длинных короткие ссылки')

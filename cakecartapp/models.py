@@ -5,6 +5,10 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 
 class Links(models.Model):
+    name = models.CharField(
+        'Название рекламы',
+        max_length=100, )
+
     long_link = models.URLField(
         'Длинная ссылка',
         max_length=200, )
