@@ -5,6 +5,7 @@ from django.http import HttpResponse
 from django.views.generic import CreateView
 from django.urls import reverse_lazy
 from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
 
 from datetime import datetime
 from decimal import Decimal
@@ -17,11 +18,19 @@ CAKE = {}
 PASSWORD = 'sC8rkSYhE8MS8NN85FQm'
 
 
-# class SignUp(CreateView):
-#     form_class = CreationForm
-#     success_url = reverse_lazy('index_view')
-#     template_name = 'signup.html'
-
+def login_user(request):
+    if request.method == 'POST':
+        username = request.POST["username"]
+        password = request.POST["password"]
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            redirect('index_view')
+        else:
+            messages.success(request, ('Возникла ошибка. Попробуйте ещё раз.'))
+            redirect('login')
+    else:
+        return(request, 'registration/login.html')
 
 def signup(request):
     form = CreationForm(request.POST)
@@ -36,8 +45,7 @@ def signup(request):
         messages.success(request, 'Вы успешно зарегистрировались!')
         return redirect('index_view')
     else:
-        # if form.errors:
-        #     messages.success(request, 'Данный логин уже занят')
+            # messages.success(request, 'Данный логин уже занят')
         form = CreationForm()
 
     context = {'form': form}

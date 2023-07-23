@@ -2,21 +2,44 @@
 {% include "header.html" %}
 
 
+
 <main>
 	<div class="container mt-header">
+        <aside class="modal fade" id="RegModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="RegModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content px-4 cake__modal">
+					<div class="modal-header border-0 pb-0 pt-4">
+						<button @click="Reset" type="button" class="btn-close border rounded-pill" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-header border-0 py-0">
+						<label for="reg" class="modal-title font_Gogh fs_40 cake_blue" id="RegModalLabel" >
+							<a href="{% url 'login' %}" class="modal-title font_Gogh fs_40 cake_blue">Вход</a> /
+							<a href="{% url 'signup' %}" class="modal-title font_Gogh fs_40 cake_blue">Регистрация</a>
+						</label>
+					</div>
+
+					<div class="modal-footer d-flex flex-column justify-content-between align-items-center text-center border-0 mx-5">
+						<p class="fs_12 cake_grey">
+							{# {{Step === `Number` ? `Нажимая на кнопку, вы соглашаетесь на обработку персональных данных в соответствии
+							с политикой конфиденциальности` : Step === 'Code' ? `Осталось времени: 05:00` : ``}} #}
+						</p>
+						<a href="#" v-if="Step === `Code`" @click.prevent="ToRegStep1" class="text-decoration-none cake_pink fs_12">изменить данные</a>
+					</div>
+				</div>
+			</div>
+		</aside>
+
 		<article id="VueApp">
 			<section class="row pt-header" id="step4">
-					<div class="col">
-                        {% if messages %}
-                            {% for message in messages %}
-                                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                                    {{ message }}
-                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                            {% endfor %}
-                        {% endif %}
+                        {% if form.errors %}
+  <div class="alert alert-warning alert-dismissible fade show" role="alert">
+      {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+{% endif %}
                           {% block title %}Зарегистрироваться{% endblock %}
                           {% block content %}
                             <form method="post" action="{% url 'signup' %}">

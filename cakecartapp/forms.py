@@ -22,6 +22,6 @@ class CreationForm(UserCreationForm):
         help_texts = {
             ''
         }
-        # widgets = {
-        #     'username': forms.TextInput(attrs={'class': 'cake__textinput'})
-        # }
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'cake__textinput'})
+        }
