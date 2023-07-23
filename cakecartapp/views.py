@@ -1,11 +1,14 @@
 import hashlib
+import smtplib
 
+from django.core.mail import send_mail
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+
 
 from datetime import datetime
 from decimal import Decimal
@@ -20,7 +23,19 @@ CAKE = {}
 PASSWORD = 'MzMJb6YTy03wLySB36bW'
 
 def send_email_with_pass(email, password):
-    pass
+    subject = 'Завершение регистрации на BakeCake'
+    message = f'''
+    Благодарим за заказ на нашем сайте!
+    Ваш логин: {email}
+    Пароль: {password}
+'''
+    recipient_list = [email,]
+    return send_mail(
+        subject,
+        message,
+        from_email=None,
+        recipient_list=recipient_list,
+    )
 
 
 def lk(request):
@@ -209,12 +224,17 @@ def pay(request):  # Сохраняем торт и заказ {CAKE}
                 user = authenticate(username=email, password=password)
                 login(request, user)
         except ValueError as error:
-            return HttpResponse(f"Ошибка сохранения клиента {error}", content_type="text/plain")
+            return HttpResponse(f"Ошибка сохранения клиента {error}",
+                                content_type="text/plain")
         except ObjectDoesNotExist as error:
-            return HttpResponse(f"Клиента по данному пользователю не существует: {error}", content_type="text/plain")
+            return HttpResponse(f"Клиента по данному пользователю не существует: {error}",
+                                content_type="text/plain")
         except MultipleObjectsReturned as error:
-            return HttpResponse(f"По данному пользователю зарегистрировано несколько клиентов: {error}", content_type="text/plain")
-
+            return HttpResponse(f"По данному пользователю зарегистрировано несколько клиентов: {error}",
+                                content_type="text/plain")
+        except smtplib.SMTPException as error:
+            return HttpResponse(f'Возникла ошибка при отправления письма с данными по регистрации {error}',
+                                content_type="text/plain")
     try:
         new_order = Order.objects.create(
             client=client,
