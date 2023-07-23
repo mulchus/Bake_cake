@@ -184,7 +184,7 @@ def pay(request):  # Сохраняем торт и заказ {CAKE}
         new_order.cake.add(new_cake)
     except ValueError as error:
         return HttpResponse(f"Ошибка сохранения заказа {error}", content_type="text/plain")
-    cost = int(CAKE['cost'])
+    cost = new_order.cost
     print(cost)
     crc = f'tortiru:{cost}::{PASSWORD}'
     print(crc)
@@ -235,6 +235,7 @@ def order(request):  # отображаем заказ на странице в�
     if difference < 24:
         cost *= 1.2
         print(cost)
+    print(cost)
     # dec_cost = Decimal(cost)
     # crc = f'tortiru:{cost}::{PASSWORD}'
     # signature = hashlib.md5(crc.encode())
