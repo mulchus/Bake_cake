@@ -38,10 +38,10 @@ def login_user(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            redirect('index_view')
+            return redirect('index_view')
         else:
             messages.success(request, ('Возникла ошибка. Попробуйте ещё раз.'))
-            redirect('login')
+            return redirect('login')
     else:
         return render(request, 'registration/login.html')
 
