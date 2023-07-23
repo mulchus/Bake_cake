@@ -45,10 +45,11 @@ def login_user(request):
             login(request, user)
             return redirect('index_view')
         else:
-            messages.success(request, ('Возникла ошибка. Попробуйте ещё раз.'))
+            messages.success(request, 'Возникла ошибка. Попробуйте ещё раз.')
             return redirect('login')
     else:
         return render(request, 'registration/login.html')
+
 
 def signup(request):
     form = CreationForm(request.POST)
@@ -72,9 +73,11 @@ def signup(request):
     context = {'form': form}
     return render(request, 'signup.html', context)
 
+
 def logout_user(request):
     logout(request)
     return redirect('index_view')
+
 
 def catalog_pay(request):  # Сохраняем торты и заказ {CAKE}
     global CAKE
@@ -105,9 +108,19 @@ def catalog_pay(request):  # Сохраняем торты и заказ {CAKE}
         new_order.cake.add(*(list(cakes)))
     except ValueError as error:
         return HttpResponse(f"Ошибка сохранения заказа {error}", content_type="text/plain")
+    cost = new_order.cost
+    crc = f'tortiru:{cost}::{PASSWORD}'
+    signature = hashlib.md5(crc.encode())
+    context = {
+        'address': new_order.address,
+        'phone': client.phone_number,
+        'email': client.email,
+        'cost': cost,
+        'signature': signature,
 
+    }
     CAKE.clear()
-    return render(request, "catalog_pay.html")
+    return render(request, "catalog_pay.html", context=context)
 
 
 def catalog_order(request):
@@ -216,11 +229,8 @@ def pay(request):  # Сохраняем торт и заказ {CAKE}
     except ValueError as error:
         return HttpResponse(f"Ошибка сохранения заказа {error}", content_type="text/plain")
     cost = new_order.cost
-    print(cost)
     crc = f'tortiru:{cost}::{PASSWORD}'
-    print(crc)
     signature = hashlib.md5(crc.encode())
-    print(signature)
     context = {
         'address': CAKE['address'],
         'delivery_date_time': CAKE['delivery_date_time'],
@@ -290,6 +300,5 @@ def order(request):  # отображаем заказ на странице в�
         'cost': cost,
         # 'signature': signature,
     }
-
 
     return render(request, "order.html", context=CAKE)
