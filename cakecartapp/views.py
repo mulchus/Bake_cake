@@ -1,11 +1,11 @@
 import hashlib
 
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from django.views.generic import CreateView
-from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 
 from datetime import datetime
 from decimal import Decimal
@@ -19,6 +19,10 @@ from .models import Levels, Form, Topping, Berries, Decoration, Order, Cake, Cli
 CAKE = {}
 PASSWORD = 'sC8rkSYhE8MS8NN85FQm'
 
+def send_email_with_pass():
+    pass
+
+
 def lk(request):
     client = Client.objects.get(user=request.user)
 
@@ -31,6 +35,7 @@ def lk(request):
     }
     return render(request, 'lk.html', context=context)
 
+
 def login_user(request):
     if request.method == 'POST':
         username = request.POST["username"]
@@ -38,12 +43,13 @@ def login_user(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            redirect('index_view')
+            return redirect('index_view')
         else:
             messages.success(request, ('Возникла ошибка. Попробуйте ещё раз.'))
-            redirect('login')
+            return redirect('login')
     else:
-        return(request, 'registration/login.html')
+        return render(request, 'registration/login.html', {})
+
 
 def signup(request):
     form = CreationForm(request.POST)
@@ -162,15 +168,38 @@ def pay(request):  # Сохраняем торт и заказ {CAKE}
     except ValueError as error:
         return HttpResponse(f"Ошибка сохранения торта, {error}", content_type="text/plain")
 
-    serialized_phone = PhoneNumber.from_string(request.POST.get('phone_format'), region='RU').as_e164
+    if request.user.is_authenticated():
+        try:
+            client = Client.objects.get(user=request.user)
+        except ObjectDoesNotExist as error:
+            return HttpResponse(f"Клиента по данному пользователю не существует: {error}", content_type="text/plain")
+        except MultipleObjectsReturned as error:
+            return HttpResponse(f"По данному пользователю зарегистрировано несколько клиентов: {error}", content_type="text/plain")
+    else:
+        serialized_phone = PhoneNumber.from_string(request.POST.get('phone_format'), region='RU').as_e164
 
-    try:
-        client, created = Client.objects.get_or_create(
-            phone_number=serialized_phone,
-            defaults={'email': request.POST.get('email_format'), 'name': request.POST.get('name_format')},
-        )
-    except ValueError as error:
-        return HttpResponse(f"Ошибка сохранения клиента {error}", content_type="text/plain")
+        try:
+            email = request.POST.get('email_format')
+            client, created = Client.objects.get_or_create(
+                phone_number=serialized_phone,
+                defaults={'email': email, 'name': request.POST.get('name_format')},
+            )
+            if created:
+                password = User.objects.make_random_password(length=9)
+                user = User.objects.create_user(
+                    username=email,
+                    password1=password,
+                    password2=password,
+                    email=email,
+                )
+                send_email_with_pass(email, password)
+                client.user = user
+                client.save()
+            else:
+                pass
+
+        except ValueError as error:
+            return HttpResponse(f"Ошибка сохранения клиента {error}", content_type="text/plain")
 
     try:
         new_order = Order.objects.create(
@@ -246,4 +275,6 @@ def order(request):  # отображаем заказ на странице в�
         'cost': cost,
         'signature': signature,
     }
+
+
     return render(request, "order.html", context=CAKE)
