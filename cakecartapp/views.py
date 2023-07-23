@@ -1,14 +1,47 @@
 import hashlib
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .models import Levels, Form, Topping, Berries, Decoration, Order, Cake, Client
+from django.views.generic import CreateView
+from django.urls import reverse_lazy
+from django.contrib import messages
+
 from datetime import datetime
 from decimal import Decimal
+
+from .forms import CreationForm
+from .models import Levels, Form, Topping, Berries, Decoration, Order, Cake, Client
+
 
 CAKE = {}
 PASSWORD = 'sC8rkSYhE8MS8NN85FQm'
 
+
+# class SignUp(CreateView):
+#     form_class = CreationForm
+#     success_url = reverse_lazy('index_view')
+#     template_name = 'signup.html'
+
+
+def signup(request):
+    form = CreationForm(request.POST)
+    if form.is_valid():
+        new_user = form.save()
+        Client.objects.create(
+            user=new_user,
+            name=form.cleaned_data['client_name'],
+            email=form.cleaned_data['email'],
+            phone_number=form.cleaned_data['phone_number'],)
+        # login(request.user)
+        messages.success(request, 'Вы успешно зарегистрировались!')
+        return redirect('index_view')
+    else:
+        # if form.errors:
+        #     messages.success(request, 'Данный логин уже занят')
+        form = CreationForm()
+
+    context = {'form': form}
+    return render(request, 'signup.html', context)
 
 def catalog_pay(request):  # Сохраняем торты и заказ {CAKE}
     global CAKE

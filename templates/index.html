@@ -10,7 +10,7 @@
 						<button @click="Reset" type="button" class="btn-close border rounded-pill" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
 					<div class="modal-header border-0 py-0">
-						<label for="reg" class="modal-title font_Gogh fs_40 cake_blue" id="RegModalLabel">Вход / Регистрация</label>
+						<label for="reg" class="modal-title font_Gogh fs_40 cake_blue" id="RegModalLabel" >Вход / <a href="{% url 'signup' %}" class="modal-title font_Gogh fs_40 cake_blue">Регистрация</a></label>
 					</div>
 					<form class="d-none">
 						<input v-model="RegInput" type="text" name="REG">

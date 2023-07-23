@@ -29,4 +29,5 @@ urlpatterns = [
     path("catalog/", views.catalog, name='catalog'),
     path("catalog_order/", views.catalog_order, name='catalog_order'),
     path("catalog_pay/", views.catalog_pay, name='catalog_pay'),
+    path('signup/', views.signup, name='signup')
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT, show_indexes=True)
