@@ -43,7 +43,7 @@ def login_user(request):
             messages.success(request, ('Возникла ошибка. Попробуйте ещё раз.'))
             redirect('login')
     else:
-        return(request, 'registration/login.html')
+        return render(request, 'registration/login.html')
 
 def signup(request):
     form = CreationForm(request.POST)
