@@ -31,5 +31,7 @@ urlpatterns = [
     path("catalog/", views.catalog, name='catalog'),
     path("catalog_order/", views.catalog_order, name='catalog_order'),
     path("catalog_pay/", views.catalog_pay, name='catalog_pay'),
-    path('signup/', views.signup, name='signup')
+    path('signup/', views.signup, name='signup'),
+    path('lk/', views.lk, name='lk'),
+    path('logout/', views.logout_user, name='logout'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT, show_indexes=True)

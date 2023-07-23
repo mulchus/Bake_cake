@@ -17,6 +17,17 @@ from .models import Levels, Form, Topping, Berries, Decoration, Order, Cake, Cli
 CAKE = {}
 PASSWORD = 'sC8rkSYhE8MS8NN85FQm'
 
+def lk(request):
+    client = Client.objects.get(user=request.user)
+
+    orders = client.orders.all()
+    context = {
+        'name': client.name,
+        'phone_number': client.phone_number,
+        'email': client.email,
+        'orders': orders,
+    }
+    return render(request, 'lk.html', context=context)
 
 def login_user(request):
     if request.method == 'POST':
@@ -50,6 +61,10 @@ def signup(request):
 
     context = {'form': form}
     return render(request, 'signup.html', context)
+
+def logout_user(request):
+    logout(request)
+    return redirect('index_view')
 
 def catalog_pay(request):  # Сохраняем торты и заказ {CAKE}
     global CAKE
