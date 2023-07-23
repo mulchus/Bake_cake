@@ -17,7 +17,7 @@ from .models import Levels, Form, Topping, Berries, Decoration, Order, Cake, Cli
 
 
 CAKE = {}
-PASSWORD = 'sC8rkSYhE8MS8NN85FQm'
+PASSWORD = 'MzMJb6YTy03wLySB36bW'
 
 def send_email_with_pass():
     pass
@@ -48,8 +48,7 @@ def login_user(request):
             messages.success(request, ('Возникла ошибка. Попробуйте ещё раз.'))
             return redirect('login')
     else:
-        return render(request, 'registration/login.html', {})
-
+        return render(request, 'registration/login.html')
 
 def signup(request):
     form = CreationForm(request.POST)
@@ -154,7 +153,6 @@ def index(request):
 
 def pay(request):  # Сохраняем торт и заказ {CAKE}
     global CAKE
-
     try:
         new_cake = Cake.objects.create(
             levels=Levels.objects.get(pk=CAKE['levels_pk']),
@@ -176,8 +174,8 @@ def pay(request):  # Сохраняем торт и заказ {CAKE}
         except MultipleObjectsReturned as error:
             return HttpResponse(f"По данному пользователю зарегистрировано несколько клиентов: {error}", content_type="text/plain")
     else:
+        print(request.POST.get('phone_format'))
         serialized_phone = PhoneNumber.from_string(request.POST.get('phone_format'), region='RU').as_e164
-
         try:
             email = request.POST.get('email_format')
             client, created = Client.objects.get_or_create(
@@ -214,9 +212,22 @@ def pay(request):  # Сохраняем торт и заказ {CAKE}
         new_order.cake.add(new_cake)
     except ValueError as error:
         return HttpResponse(f"Ошибка сохранения заказа {error}", content_type="text/plain")
-
-    CAKE.clear()
-    return render(request, "pay.html")
+    cost = new_order.cost
+    print(cost)
+    crc = f'tortiru:{cost}::{PASSWORD}'
+    print(crc)
+    signature = hashlib.md5(crc.encode())
+    print(signature)
+    context = {
+        'address': CAKE['address'],
+        'delivery_date_time': CAKE['delivery_date_time'],
+        'phone': client.phone_number,
+        'email': client.email,
+        'cost': cost,
+        'signature': signature,
+    }
+    # CAKE.clear()
+    return render(request, "pay.html", context=context)
 
 
 def order(request):  # отображаем заказ на странице ввода данных клиента
@@ -252,9 +263,10 @@ def order(request):  # отображаем заказ на странице в�
     if difference < 24:
         cost *= 1.2
         print(cost)
-    dec_cost = Decimal(cost)
-    crc = f'tortiru:{cost}::{PASSWORD}'
-    signature = hashlib.md5(crc.encode())
+    print(cost)
+    # dec_cost = Decimal(cost)
+    # crc = f'tortiru:{cost}::{PASSWORD}'
+    # signature = hashlib.md5(crc.encode())
 
     CAKE = {
         'levels': levels.quantity,
@@ -273,7 +285,7 @@ def order(request):  # отображаем заказ на странице в�
         'delivery_date_time': delivery_date_time,
         'courier_comment': request.POST.get('deliv-comment'),
         'cost': cost,
-        'signature': signature,
+        # 'signature': signature,
     }
 
 
