@@ -2,7 +2,26 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import User
 from phonenumber_field.modelfields import PhoneNumberField
-import django.contrib.auth.forms
+
+
+class Links(models.Model):
+    long_link = models.URLField(
+        'Длинная ссылка',
+        max_length=200, )
+
+    short_link = models.URLField(
+        'Короткая ссылка',
+        max_length=30,
+        null=True,
+        blank=True)
+
+    views_number = models.IntegerField(
+        'Количество просмотров',
+        default=0, )
+
+    class Meta:
+        verbose_name = 'Ссылка'
+        verbose_name_plural = 'Ссылки'
 
 
 class Form(models.Model):
@@ -158,14 +177,6 @@ class Cake(models.Model):
 
     def __str__(self):
         return f'{self.id}. {self.name} {self.category}'
-
-    # def admin_image(self):
-    #     return '<img src="%s"/>' % self.image
-    #
-    # def admin_image(self,obj):
-    #     return format_html(f'<img src="{0}" style="width: 45px; height:45px;" />'.format(obj.image.url))
-    #
-    # admin_image.allow_tags = True
 
 
 class Client(models.Model):
