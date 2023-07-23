@@ -9,6 +9,8 @@ from django.contrib.auth import authenticate, login, logout
 
 from datetime import datetime
 from decimal import Decimal
+from phonenumber_field.phonenumber import PhoneNumber
+
 
 from .forms import CreationForm
 from .models import Levels, Form, Topping, Berries, Decoration, Order, Cake, Client
@@ -47,12 +49,15 @@ def signup(request):
     form = CreationForm(request.POST)
     if form.is_valid():
         new_user = form.save()
+        username = form.cleaned_data['username']
+        password = form.cleaned_data['password1']
         Client.objects.create(
             user=new_user,
             name=form.cleaned_data['client_name'],
             email=form.cleaned_data['email'],
             phone_number=form.cleaned_data['phone_number'],)
-        # login(request.user)
+        user = authenticate(username=username, password=password)
+        login(request, user)
         messages.success(request, 'Вы успешно зарегистрировались!')
         return redirect('index_view')
     else:
@@ -69,9 +74,12 @@ def logout_user(request):
 def catalog_pay(request):  # Сохраняем торты и заказ {CAKE}
     global CAKE
     cakes = CAKE['selected_cakes']
+
+    serialized_phone = PhoneNumber.from_string(request.POST.get('phone_format'), region='RU').as_e164
+
     try:
         client, created = Client.objects.get_or_create(
-            phone_number=request.POST.get('phone_format'),
+            phone_number=serialized_phone,
             defaults={'email': request.POST.get('email_format'), 'name': request.POST.get('name_format')},
         )
     except ValueError as error:
@@ -154,9 +162,11 @@ def pay(request):  # Сохраняем торт и заказ {CAKE}
     except ValueError as error:
         return HttpResponse(f"Ошибка сохранения торта, {error}", content_type="text/plain")
 
+    serialized_phone = PhoneNumber.from_string(request.POST.get('phone_format'), region='RU').as_e164
+
     try:
         client, created = Client.objects.get_or_create(
-            phone_number=request.POST.get('phone_format'),
+            phone_number=serialized_phone,
             defaults={'email': request.POST.get('email_format'), 'name': request.POST.get('name_format')},
         )
     except ValueError as error:
