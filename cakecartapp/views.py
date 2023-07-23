@@ -1,5 +1,4 @@
 import hashlib
-
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.views.generic import CreateView
@@ -19,6 +18,7 @@ from .models import Levels, Form, Topping, Berries, Decoration, Order, Cake, Cli
 CAKE = {}
 PASSWORD = 'MzMJb6YTy03wLySB36bW'
 
+
 def lk(request):
     client = Client.objects.get(user=request.user)
 
@@ -30,6 +30,7 @@ def lk(request):
         'orders': orders,
     }
     return render(request, 'lk.html', context=context)
+
 
 def login_user(request):
     if request.method == 'POST':
@@ -44,6 +45,7 @@ def login_user(request):
             return redirect('login')
     else:
         return render(request, 'registration/login.html')
+
 
 def signup(request):
     form = CreationForm(request.POST)
@@ -67,9 +69,11 @@ def signup(request):
     context = {'form': form}
     return render(request, 'signup.html', context)
 
+
 def logout_user(request):
     logout(request)
     return redirect('index_view')
+
 
 def catalog_pay(request):  # Сохраняем торты и заказ {CAKE}
     global CAKE
