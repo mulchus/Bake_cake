@@ -6,7 +6,7 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 from phonenumber_field.phonenumber import PhoneNumber
 
@@ -150,12 +150,16 @@ def catalog(request):
 
 
 def index(request):
+    min_datetime = datetime.now() + timedelta(hours=6)
+    min_date = min_datetime.date()
+    min_time = min_datetime.time()
     cake_elements = {
         'levels': Levels.objects.all(),
         'forms': Form.objects.all(),
         'toppings': Topping.objects.all(),
         'berries': Berries.objects.all(),
         'decors': Decoration.objects.all(),
+        'min_date': min_date,
     }
     return render(request, "index.html", context=cake_elements)
 
