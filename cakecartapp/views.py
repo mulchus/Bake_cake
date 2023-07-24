@@ -150,9 +150,11 @@ def catalog(request):
 
 
 def index(request):
-    min_datetime = datetime.now() + timedelta(hours=6)
-    min_date = min_datetime.date()
-    min_time = min_datetime.time()
+    min_datetime = datetime.now() + timedelta(hours=10)
+    min_date = format(min_datetime.date())
+    print(min_date)
+    min_time = format(min_datetime.time())
+    print(min_time)
     cake_elements = {
         'levels': Levels.objects.all(),
         'forms': Form.objects.all(),
@@ -160,6 +162,7 @@ def index(request):
         'berries': Berries.objects.all(),
         'decors': Decoration.objects.all(),
         'min_date': min_date,
+        'min_time': min_time
     }
     return render(request, "index.html", context=cake_elements)
 
@@ -247,6 +250,9 @@ def order(request):  # отображаем заказ на странице в�
     delivery_date_time = datetime.strptime(f"{request.POST.get('date')} {request.POST.get('time')}", "%Y-%m-%d %H:%M")
     difference = (delivery_date_time - datetime.now()).seconds / 3600
     print(difference, cost)
+    if difference < 10:
+        messages.success(request, ('Минимальное время на изготовление и доставку 10 часов.'))
+        return redirect('index_view')
     if difference < 24:
         cost *= 1.2
         print(cost)
