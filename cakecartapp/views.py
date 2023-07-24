@@ -90,7 +90,10 @@ def catalog_pay(request):  # Сохраняем торты и заказ {CAKE}
         return HttpResponse(f"Ошибка сохранения клиента {error}", content_type="text/plain")
 
     delivery_date_time = datetime.strptime(f"{request.POST.get('date')} {request.POST.get('time')}", "%Y-%m-%d %H:%M")
-
+    difference = (delivery_date_time - datetime.now()).total_seconds() / 3600
+    if difference < 2:
+        messages.success(request, ('Минимальное время на доставку 2 часа.'))
+        return redirect('catalog_order')
     try:
         new_order = Order.objects.create(
             client=client,
@@ -124,10 +127,14 @@ def catalog_order(request):
     selected_cakes = Cake.objects.filter(pk__in=request.POST.getlist('selected_cakes'))
 
     cost = sum([cake.price for cake in selected_cakes])
+    min_datetime = datetime.now() + timedelta(hours=2)
+    min_date = format(min_datetime.date())
+    min_time = format(min_datetime.time())
 
     context = {
         'selected_cakes': selected_cakes,
         'cost': cost,
+        'min_date': min_date,
     }
     CAKE = context
     return render(request, "catalog_order.html", context=context)
@@ -152,9 +159,7 @@ def catalog(request):
 def index(request):
     min_datetime = datetime.now() + timedelta(hours=10)
     min_date = format(min_datetime.date())
-    print(min_date)
     min_time = format(min_datetime.time())
-    print(min_time)
     cake_elements = {
         'levels': Levels.objects.all(),
         'forms': Form.objects.all(),
@@ -248,8 +253,7 @@ def order(request):  # отображаем заказ на странице в�
         cost += decor.price
 
     delivery_date_time = datetime.strptime(f"{request.POST.get('date')} {request.POST.get('time')}", "%Y-%m-%d %H:%M")
-    difference = (delivery_date_time - datetime.now()).seconds / 3600
-    print(difference, cost)
+    difference = (delivery_date_time - datetime.now()).total_seconds() / 3600
     if difference < 10:
         messages.success(request, ('Минимальное время на изготовление и доставку 10 часов.'))
         return redirect('index_view')
