@@ -1,6 +1,7 @@
 # Сайт производства тортов BakeCake
 
 Это сайт сети роизводства тортов BakeCake. Здесь можно заказать превосходные торты с доставкой на дом.
+![site](https://github.com/mulchus/Bake_cake/assets/111083714/a9e041ae-fdc8-463b-9f8a-3ccfb08cdf44)
 
 
 ## Переменные окружения
@@ -15,11 +16,13 @@
 - `EMAIL_USE_SSL` = True  
 - `EMAIL_HOST_USER` = 'bakecake@yandex.ru'  
 - `EMAIL_HOST_PASSWORD` = 'password'  
-- 
+
+настроить Django:  
 - `SECRET_KEY` — секретный ключ проекта в Django. [Как получить?](https://stackoverflow.com/questions/41298963/is-there-a-function-for-generating-settings-secret-key-in-django).   
 - `DEBUG` — дебаг-режим. Поставьте `True`, чтобы увидеть отладочную информацию в случае ошибки.  
 - `ALLOWED_HOSTS` — (адрес сайта без протокола HTTPS). [Документация Django](https://docs.djangoproject.com/en/3.1/ref/settings/#allowed-hosts).  
-- `CSRF_TRUSTED_ORIGINS` = (полный адрес сайта, включая протокол HTTPS)  
+- `CSRF_TRUSTED_ORIGINS` = (полный адрес сайта, включая протокол HTTPS)
+  
 следующие настройки менять не требуется, значения проставлены для деплоя:  
 - `STATIC_ROOT = assets`  
 - `SECURE_HSTS_SECONDS = 10`  
@@ -53,8 +56,7 @@
 
 
 ## Панель администратора
-
-
+![admin-panel](https://github.com/mulchus/Bake_cake/assets/111083714/43fb6c5b-a39f-41a0-ab3b-fae76cab3a43)
 
 
 ## Цели проекта
