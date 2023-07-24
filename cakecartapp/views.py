@@ -22,6 +22,7 @@ from .models import Levels, Form, Topping, Berries, Decoration, Order, Cake, Cli
 CAKE = {}
 PASSWORD = 'MzMJb6YTy03wLySB36bW'
 
+
 def send_email_with_pass(email, password):
     subject = 'Завершение регистрации на BakeCake'
     message = f'''
@@ -292,14 +293,8 @@ def order(request):  # отображаем заказ на странице в�
 
     delivery_date_time = datetime.strptime(f"{request.POST.get('date')} {request.POST.get('time')}", "%Y-%m-%d %H:%M")
     difference = (delivery_date_time - datetime.now()).seconds / 3600
-    print(difference, cost)
     if difference < 24:
         cost *= 1.2
-        print(cost)
-    print(cost)
-    # dec_cost = Decimal(cost)
-    # crc = f'tortiru:{cost}::{PASSWORD}'
-    # signature = hashlib.md5(crc.encode())
 
     CAKE = {
         'levels': levels.quantity,
@@ -318,7 +313,6 @@ def order(request):  # отображаем заказ на странице в�
         'delivery_date_time': delivery_date_time,
         'courier_comment': request.POST.get('deliv-comment'),
         'cost': cost,
-        # 'signature': signature,
     }
 
     return render(request, "order.html", context=CAKE)
