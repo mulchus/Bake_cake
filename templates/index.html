@@ -188,18 +188,20 @@
 							<label for="date" class="my-1 fs_40 cake_blue">Дата</label>
 							<label for="time" class="my-1 fs_40 cake_blue">Время</label>
 						</div>
-						{% if messages %}
-						{% for message in messages %}
-						  <div class="me-5 fs_30 cake_pink text-center {{message.tags}} alert-dismissible fade show" role="alert">
-						  {{ message }}
-						  </div>
-						{% endfor %}
-					  {% endif %}
-
 						<div class="col-6 col-lg-4 d-flex flex-column">
 							<v-field v-model="Address" :class="Address ? 'cake__border_blue': ''" type="text" name="address" id="address" placeholder="Введите ваш адрес" class="form-control my-3 cake__textinput"></v-field>
 							<v-field v-model="Dates" :class="Dates ? 'cake__border_blue': ''" type="date" name="date" id="date" placeholder="ДД.ММ.ГГ" class="form-control my-3 cake__textinput" min="{{ min_date }}"></v-field>
 							<v-field v-model="Time" :class="Time ? 'cake__border_blue': ''" type="time" name="time" id="time" placeholder="00:00" class="form-control my-3 cake__textinput" {% if date == min_date %} min="{{ min_time }}" {% endif %}></v-field>
+							<div class="d-flex message">
+								{% if messages %}
+								{% for message in messages %}
+								  <p class="me-5 fs_30 cake_pink text-center {{message.tags}} alert-dismissible fade show" role="alert">
+								  {{ message }}
+								  </p>
+								{% endfor %}
+							  {% endif %}
+		
+							</div>
 						</div>
 						<div class="col-12 col-md-6">
 							<label for="deliv-comment" class="cake_blue">Комментарий для курьера</label>
@@ -214,14 +216,6 @@
 			</section>
 		</article>
 	</div>
-  {% if messages %}
-	{% for message in messages %}
-		<div class="alert {{message.tags}} alert-dismissible fade show" role="alert">
-		{{ message }}
-		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-		</div>
-	{% endfor %}
-  {% endif %}
 </main>
 
 {% include "footer.html" %}
