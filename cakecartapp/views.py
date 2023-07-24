@@ -1,15 +1,16 @@
 import hashlib
+import smtplib
+
+from django.core.mail import send_mail
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from django.views.generic import CreateView
-from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 
 from datetime import datetime, timedelta
-from decimal import Decimal
 from phonenumber_field.phonenumber import PhoneNumber
-
 
 from .forms import CreationForm
 from .models import Levels, Form, Topping, Berries, Decoration, Order, Cake, Client
@@ -17,6 +18,22 @@ from .models import Levels, Form, Topping, Berries, Decoration, Order, Cake, Cli
 
 CAKE = {}
 PASSWORD = 'MzMJb6YTy03wLySB36bW'
+
+
+def send_email_with_pass(email, password):
+    subject = 'Завершение регистрации на BakeCake'
+    message = f'''
+    Благодарим за заказ на нашем сайте!
+    Ваш логин: {email}
+    Пароль: {password}
+'''
+    recipient_list = [email,]
+    return send_mail(
+        subject,
+        message,
+        from_email=None,
+        recipient_list=recipient_list,
+    )
 
 
 def lk(request):
@@ -41,7 +58,7 @@ def login_user(request):
             login(request, user)
             return redirect('index_view')
         else:
-            messages.success(request, ('Возникла ошибка. Попробуйте ещё раз.'))
+            messages.success(request, 'Возникла ошибка. Попробуйте ещё раз.')
             return redirect('login')
     else:
         return render(request, 'registration/login.html')
@@ -63,7 +80,7 @@ def signup(request):
         messages.success(request, 'Вы успешно зарегистрировались!')
         return redirect('index_view')
     else:
-            # messages.success(request, 'Данный логин уже занят')
+        # messages.success(request, 'Данный логин уже занят')
         form = CreationForm()
 
     context = {'form': form}
@@ -79,15 +96,48 @@ def catalog_pay(request):  # Сохраняем торты и заказ {CAKE}
     global CAKE
     cakes = CAKE['selected_cakes']
 
-    serialized_phone = PhoneNumber.from_string(request.POST.get('phone_format'), region='RU').as_e164
+    if request.user.is_authenticated:
+        try:
+            client = Client.objects.get(user=request.user)
+        except ObjectDoesNotExist as error:
+            return HttpResponse(f"Клиента по данному пользователю не существует: {error}", content_type="text/plain")
+        except MultipleObjectsReturned as error:
+            return HttpResponse(f"По данному пользователю зарегистрировано несколько клиентов: {error}", content_type="text/plain")
+    else:
+        serialized_phone = PhoneNumber.from_string(request.POST.get('phone_format'), region='RU').as_e164
+        try:
+            email = request.POST.get('email_format')
+            if Client.objects.filter(phone_number=serialized_phone).exists():
+                client = Client.objects.get(phone_number=serialized_phone)
+                # user = authenticate(username=client.user, password=client.user.password)
+                login(request, client.user)
+            else:
+                password = User.objects.make_random_password(length=9)
+                user = User.objects.create_user(
+                    username=email,
+                    password=password,
+                    email=email,)
 
-    try:
-        client, created = Client.objects.get_or_create(
-            phone_number=serialized_phone,
-            defaults={'email': request.POST.get('email_format'), 'name': request.POST.get('name_format')},
-        )
-    except ValueError as error:
-        return HttpResponse(f"Ошибка сохранения клиента {error}", content_type="text/plain")
+                client = Client.objects.create(
+                    phone_number=serialized_phone,
+                    email=email,
+                    name=request.POST.get('name_format'),
+                    user=user,)
+                send_email_with_pass(email, password)
+                user = authenticate(username=email, password=password)
+                login(request, user)
+        except ValueError as error:
+            return HttpResponse(f"Ошибка сохранения клиента {error}",
+                                content_type="text/plain")
+        except ObjectDoesNotExist as error:
+            return HttpResponse(f"Клиента по данному пользователю не существует: {error}",
+                                content_type="text/plain")
+        except MultipleObjectsReturned as error:
+            return HttpResponse(f"По данному пользователю зарегистрировано несколько клиентов: {error}",
+                                content_type="text/plain")
+        except smtplib.SMTPException as error:
+            return HttpResponse(f'Возникла ошибка при отправления письма с данными по регистрации {error}',
+                                content_type="text/plain")
 
     delivery_date_time = datetime.strptime(f"{request.POST.get('date')} {request.POST.get('time')}", "%Y-%m-%d %H:%M")
     difference = (delivery_date_time - datetime.now()).total_seconds() / 3600
@@ -186,17 +236,48 @@ def pay(request):  # Сохраняем торт и заказ {CAKE}
         )
     except ValueError as error:
         return HttpResponse(f"Ошибка сохранения торта, {error}", content_type="text/plain")
-    print(request.POST.get('phone_format'))
-    serialized_phone = PhoneNumber.from_string(request.POST.get('phone_format'), region='RU').as_e164
+    if request.user.is_authenticated:
+        try:
+            client = Client.objects.get(user=request.user)
+        except ObjectDoesNotExist as error:
+            return HttpResponse(f"Клиента по данному пользователю не существует: {error}", content_type="text/plain")
+        except MultipleObjectsReturned as error:
+            return HttpResponse(f"По данному пользователю зарегистрировано несколько клиентов: {error}", content_type="text/plain")
+    else:
+        serialized_phone = PhoneNumber.from_string(request.POST.get('phone_format'), region='RU').as_e164
+        try:
+            email = request.POST.get('email_format')
+            if Client.objects.filter(phone_number=serialized_phone).exists():
+                client = Client.objects.get(phone_number=serialized_phone)
+                # user = authenticate(username=client.user, password=client.user.password)
+                login(request, client.user)
+            else:
+                password = User.objects.make_random_password(length=9)
+                user = User.objects.create_user(
+                    username=email,
+                    password=password,
+                    email=email,)
 
-    try:
-        client, created = Client.objects.get_or_create(
-            phone_number=serialized_phone,
-            defaults={'email': request.POST.get('email_format'), 'name': request.POST.get('name_format')},
-        )
-    except ValueError as error:
-        return HttpResponse(f"Ошибка сохранения клиента {error}", content_type="text/plain")
-
+                client = Client.objects.create(
+                    phone_number=serialized_phone,
+                    email=email,
+                    name=request.POST.get('name_format'),
+                    user=user,)
+                send_email_with_pass(email, password)
+                user = authenticate(username=email, password=password)
+                login(request, user)
+        except ValueError as error:
+            return HttpResponse(f"Ошибка сохранения клиента {error}",
+                                content_type="text/plain")
+        except ObjectDoesNotExist as error:
+            return HttpResponse(f"Клиента по данному пользователю не существует: {error}",
+                                content_type="text/plain")
+        except MultipleObjectsReturned as error:
+            return HttpResponse(f"По данному пользователю зарегистрировано несколько клиентов: {error}",
+                                content_type="text/plain")
+        except smtplib.SMTPException as error:
+            return HttpResponse(f'Возникла ошибка при отправления письма с данными по регистрации {error}',
+                                content_type="text/plain")
     try:
         new_order = Order.objects.create(
             client=client,
@@ -259,11 +340,6 @@ def order(request):  # отображаем заказ на странице в�
         return redirect('index_view')
     if difference < 24:
         cost *= 1.2
-        print(cost)
-    print(cost)
-    # dec_cost = Decimal(cost)
-    # crc = f'tortiru:{cost}::{PASSWORD}'
-    # signature = hashlib.md5(crc.encode())
 
     CAKE = {
         'levels': levels.quantity,
@@ -282,6 +358,10 @@ def order(request):  # отображаем заказ на странице в�
         'delivery_date_time': delivery_date_time,
         'courier_comment': request.POST.get('deliv-comment'),
         'cost': cost,
-        # 'signature': signature,
     }
+
     return render(request, "order.html", context=CAKE)
+
+
+def permited(request):
+    return render(request, "permited.html")
