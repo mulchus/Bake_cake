@@ -104,6 +104,17 @@ class LinksAdmin(DjangoObjectActions, admin.ModelAdmin):
     changelist_actions = ('update_links', )
 
 
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ('cakes', 'client', 'address', 'delivery_date_time')
+
+    def cakes(self, row):
+        return ','.join([cake.name for cake in row.cake.all()])
+
+    class Meta:
+        ordering = ('delivery_date_time', )
+
+
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 admin.site.register(Form)
@@ -113,4 +124,3 @@ admin.site.register(Berries)
 admin.site.register(Decoration)
 admin.site.register(Cake, CakeAdmin)
 admin.site.register(Client)
-admin.site.register(Order)
