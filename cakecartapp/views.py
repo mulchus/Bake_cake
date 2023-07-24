@@ -9,11 +9,8 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 
-
 from datetime import datetime
-from decimal import Decimal
 from phonenumber_field.phonenumber import PhoneNumber
-
 
 from .forms import CreationForm
 from .models import Levels, Form, Topping, Berries, Decoration, Order, Cake, Client
@@ -99,15 +96,48 @@ def catalog_pay(request):  # Сохраняем торты и заказ {CAKE}
     global CAKE
     cakes = CAKE['selected_cakes']
 
-    serialized_phone = PhoneNumber.from_string(request.POST.get('phone_format'), region='RU').as_e164
+    if request.user.is_authenticated:
+        try:
+            client = Client.objects.get(user=request.user)
+        except ObjectDoesNotExist as error:
+            return HttpResponse(f"Клиента по данному пользователю не существует: {error}", content_type="text/plain")
+        except MultipleObjectsReturned as error:
+            return HttpResponse(f"По данному пользователю зарегистрировано несколько клиентов: {error}", content_type="text/plain")
+    else:
+        serialized_phone = PhoneNumber.from_string(request.POST.get('phone_format'), region='RU').as_e164
+        try:
+            email = request.POST.get('email_format')
+            if Client.objects.filter(phone_number=serialized_phone).exists():
+                client = Client.objects.get(phone_number=serialized_phone)
+                # user = authenticate(username=client.user, password=client.user.password)
+                login(request, client.user)
+            else:
+                password = User.objects.make_random_password(length=9)
+                user = User.objects.create_user(
+                    username=email,
+                    password=password,
+                    email=email,)
 
-    try:
-        client, created = Client.objects.get_or_create(
-            phone_number=serialized_phone,
-            defaults={'email': request.POST.get('email_format'), 'name': request.POST.get('name_format')},
-        )
-    except ValueError as error:
-        return HttpResponse(f"Ошибка сохранения клиента {error}", content_type="text/plain")
+                client = Client.objects.create(
+                    phone_number=serialized_phone,
+                    email=email,
+                    name=request.POST.get('name_format'),
+                    user=user,)
+                send_email_with_pass(email, password)
+                user = authenticate(username=email, password=password)
+                login(request, user)
+        except ValueError as error:
+            return HttpResponse(f"Ошибка сохранения клиента {error}",
+                                content_type="text/plain")
+        except ObjectDoesNotExist as error:
+            return HttpResponse(f"Клиента по данному пользователю не существует: {error}",
+                                content_type="text/plain")
+        except MultipleObjectsReturned as error:
+            return HttpResponse(f"По данному пользователю зарегистрировано несколько клиентов: {error}",
+                                content_type="text/plain")
+        except smtplib.SMTPException as error:
+            return HttpResponse(f'Возникла ошибка при отправления письма с данными по регистрации {error}',
+                                content_type="text/plain")
 
     delivery_date_time = datetime.strptime(f"{request.POST.get('date')} {request.POST.get('time')}", "%Y-%m-%d %H:%M")
 
@@ -316,3 +346,7 @@ def order(request):  # отображаем заказ на странице в�
     }
 
     return render(request, "order.html", context=CAKE)
+
+
+def permited(request):
+    return render(request, "permited.html")

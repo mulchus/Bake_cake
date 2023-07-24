@@ -81,7 +81,6 @@ class LinksAdmin(DjangoObjectActions, admin.ModelAdmin):
                 except requests.exceptions.HTTPError:
                     print('Ошибка в ссылке')
                 else:
-                    print('Битлинк: ', bitlink)
                     link.short_link = bitlink
                     link.save()
             else:
@@ -91,7 +90,6 @@ class LinksAdmin(DjangoObjectActions, admin.ModelAdmin):
                     except requests.exceptions.HTTPError:
                         print('Ошибка при попытке получить количество кликов на ссылке')
                     else:
-                        print(f'По ссылке {link.short_link} перешли {clicks_count} раз(а)')
                         link.views_number = clicks_count
                         link.save()
                 else:
@@ -100,7 +98,6 @@ class LinksAdmin(DjangoObjectActions, admin.ModelAdmin):
                     except requests.exceptions.HTTPError:
                         print('Ошибка в ссылке')
                     else:
-                        print('Битлинк: ', bitlink)
                         link.short_link = bitlink
                         link.save()
 
