@@ -5,56 +5,95 @@
 	<div class="container mt-header">
 		<article id="VueApp">
 			<section class="row pt-header" id="step4">
-				<v-form :validation-schema="schema2" method="post" action="{% url 'pay' %}">
-					{% csrf_token %}
-					<div class="col">
-						<div class="d-flex flex-column position-relative pb-5">
-							<h2 class="fs_40 font_Gogh cake_blue text-center align-self-center">Оформление заказа</h2>
-							<p class="my-1 fs_30 cake_blue">Уровней: {{ levels }}</p>
-							<p class="my-1 fs_30 cake_blue">Форма: {{ form }}</p>
-							<p class="my-1 fs_30 cake_blue">Топпинг: {{ topping }}</p>
-							<p class="my-1 fs_30 cake_blue">Ягоды: {{ berries }}</p>
-							<p class="my-1 fs_30 cake_blue">Декор: {{ decor }}</p>
-							<p class="my-1 fs_30 cake_blue">Надпись: {{ words }}</p>
-							<p class="my-1 fs_30 cake_blue">Комментарий к заказу: {{ comment }}</p>
-							<hr />
-							<p class="my-1 fs_30 cake_blue">Адрес доставки: {{ address }}</p>
-							<p class="my-1 fs_30 cake_blue">Дата и время доставки: {{ delivery_date_time|date:"l, d F y" }}</p>
-							<p class="my-1 fs_30 cake_blue">Комментарий для курьера: {{ courier_comment }}</p>
-							<hr />
-
-							<span class="cake_pink mt-2 position-absolute bottom-0">
-								<error-message name="name" class="from__alert"></error-message>
-								<error-message name="phone" class="from__alert"></error-message>
-								<error-message name="email" class="from__alert"></error-message>
-							</span>
-						</div>
-
-						<div class="row">
-							<div class="col-6 col-lg-4 d-flex flex-column">
-								<label for="name" class="my-1 fs_40 cake_blue">Имя</label>
-								<label for="phone" class="my-1 fs_40 cake_blue">Телефон</label>
-								<label for="email" class="my-1 fs_40 cake_blue">Почта</label>
+				{% if not user.is_authenticated %}
+					<v-form :validation-schema="schema2" method="post" action="{% url 'pay' %}">
+						{% csrf_token %}
+						<div class="col">
+							<div class="d-flex flex-column position-relative pb-5">
+								<h2 class="fs_40 font_Gogh cake_blue text-center align-self-center">Оформление заказа</h2>
+								<p class="my-1 fs_30 cake_blue">Уровней: {{ levels }}</p>
+								<p class="my-1 fs_30 cake_blue">Форма: {{ form }}</p>
+								<p class="my-1 fs_30 cake_blue">Топпинг: {{ topping }}</p>
+								<p class="my-1 fs_30 cake_blue">Ягоды: {{ berries }}</p>
+								<p class="my-1 fs_30 cake_blue">Декор: {{ decor }}</p>
+								<p class="my-1 fs_30 cake_blue">Надпись: {{ words }}</p>
+								<p class="my-1 fs_30 cake_blue">Комментарий к заказу: {{ comment }}</p>
+								<hr />
+								<p class="my-1 fs_30 cake_blue">Адрес доставки: {{ address }}</p>
+								<p class="my-1 fs_30 cake_blue">Дата и время доставки: {{ delivery_date_time|date:"l, d F y" }}</p>
+								<p class="my-1 fs_30 cake_blue">Комментарий для курьера: {{ courier_comment }}</p>
+								<hr />
 							</div>
-							<div class="col-6 col-lg-4 d-flex flex-column">
-								<div class="position-relative pb-1">
-									<v-field v-model="Name" :class="Name ? 'cake__border_blue': ''" type="text" name="name" id="name" placeholder="Введите ваше имя" class="form-control my-3 cake__textinput"></v-field>
-									<v-field v-model="Name" type="text" name="name_format" class="d-none"></v-field>
-									<error-message name="name_format" class="position-absolute bottom-0 cake_pink fs_12"></error-message>
-								</div>
-								<div class="position-relative pb-1">
-									<v-field v-model="Phone" :class="Phone ? 'cake__border_blue': ''" type="tel" name="phone" id="phone" placeholder="Введите номер" class="form-control my-3 cake__textinput"></v-field>
-									<v-field v-model="Phone" type="phone" name="phone_format" class="d-none"></v-field>
-									<error-message name="phone_format" class="position-absolute bottom-0 cake_pink fs_12"></error-message>
-								</div>
-								<div class="position-relative pb-1">
-									<v-field v-model="Email" :class="Email ? 'cake__border_blue': ''" type="email" name="email" id="email" placeholder="Введите почту" class="form-control my-3 cake__textinput"></v-field>
-									<v-field v-model="Email" type="email" name="email_format" class="d-none"></v-field>
-									<error-message name="email_format" class="position-absolute bottom-0 cake_pink fs_12"></error-message>
+								<div class="row">
+									<span class="cake_pink mt-2 position-absolute bottom-0">
+										<error-message name="name" class="from__alert"></error-message>
+										<error-message name="phone" class="from__alert"></error-message>
+										<error-message name="email" class="from__alert"></error-message>
+									</span>
+									<div class="col-6 col-lg-4 d-flex flex-column">
+										<label for="name" class="my-1 fs_40 cake_blue">Имя</label>
+										<label for="phone" class="my-1 fs_40 cake_blue">Телефон</label>
+										<label for="email" class="my-1 fs_40 cake_blue">Почта</label>
+									</div>
+									<div class="col-6 col-lg-4 d-flex flex-column">
+										<div class="position-relative pb-1">
+											<v-field v-model="Name" :class="Name ? 'cake__border_blue': ''" type="text" name="name" id="name" placeholder="Введите ваше имя" class="form-control my-3 cake__textinput"></v-field>
+											<v-field v-model="Name" type="text" name="name_format" class="d-none"></v-field>
+											<error-message name="name_format" class="position-absolute bottom-0 cake_pink fs_12"></error-message>
+										</div>
+										<div class="position-relative pb-1">
+											<v-field v-model="Phone" :class="Phone ? 'cake__border_blue': ''" type="tel" name="phone" id="phone" placeholder="Введите номер" class="form-control my-3 cake__textinput"></v-field>
+											<v-field v-model="Phone" type="phone" name="phone_format" class="d-none"></v-field>
+											<error-message name="phone_format" class="position-absolute bottom-0 cake_pink fs_12"></error-message>
+										</div>
+										<div class="position-relative pb-1">
+											<v-field v-model="Email" :class="Email ? 'cake__border_blue': ''" type="email" name="email" id="email" placeholder="Введите почту" class="form-control my-3 cake__textinput"></v-field>
+											<v-field v-model="Email" type="email" name="email_format" class="d-none"></v-field>
+											<error-message name="email_format" class="position-absolute bottom-0 cake_pink fs_12"></error-message>
+										</div>
+									</div>
+							</div>
+							<p class="fs_14  cake_blue">После заполнения формы, на указанную почту придёт письмо с логином и паролем от Личного Кабинета.</p>
+							<p class="fs_12 cake_grey">
+								Нажимая на кнопку "Оплатить", вы соглашаетесь на обработку персональных данных в соответствии
+								<a href="#" class="cake_grey fs_12">с политикой конфиденциальности.</a>.
+							</p>
+							<div class="row mt-3">
+								<div class="col-12 col-md-6 d-flex flex-column align-items-center align-items-md-end mt-3 mt-md-0">
+									<div class="d-flex">
+										<span class="cake_pink fs_40 fw-bold me-2">Итого: {{ cost }}₽</span>
+									</div>
+									<button onclick="window.location.href='https://auth.robokassa.ru/Merchant/Index.aspx?MerchantLogin=tortiru&Culture=ru&Encoding=utf-8&OutSum={{ cost }}&shp_interface=link&SignatureValue={{ signature }}';" type="submit" class="btn btn_hover text-white rounded-pill mt-3 px-5 shadow-none cake__button cake__bg_pink">Оплатить</button>
 								</div>
 							</div>
 						</div>
+					</v-form>
+				{% else %}
+					<v-form :validation-schema="schema4" method="post" action="{% url 'pay' %}">
+						{% csrf_token %}
+						<div class="col">
+							<div class="d-flex flex-column position-relative pb-2">
+								<h2 class="fs_40 font_Gogh cake_blue text-center align-self-center">Оформление заказа</h2>
+								<p class="my-1 fs_30 cake_blue">Уровней: {{ levels }}</p>
+								<p class="my-1 fs_30 cake_blue">Форма: {{ form }}</p>
+								<p class="my-1 fs_30 cake_blue">Топпинг: {{ topping }}</p>
+								<p class="my-1 fs_30 cake_blue">Ягоды: {{ berries }}</p>
+								<p class="my-1 fs_30 cake_blue">Декор: {{ decor }}</p>
+								<p class="my-1 fs_30 cake_blue">Надпись: {{ words }}</p>
+								<p class="my-1 fs_30 cake_blue">Комментарий к заказу: {{ comment }}</p>
+								<hr />
+								<p class="my-1 fs_30 cake_blue">Адрес доставки: {{ address }}</p>
+								<p class="my-1 fs_30 cake_blue">Дата и время доставки: {{ delivery_date_time|date:"l, d F y" }}</p>
+								<p class="my-1 fs_30 cake_blue">Комментарий для курьера: {{ courier_comment }}</p>
+								<hr />
+								<p class="my-1 fs_30 cake_blue pb-4">Почта: {{user.email}}</p>
 
+							</div>
+						</div>
+						<p class="fs_15 cake_grey">
+							Нажимая на кнопку "Оплатить", вы соглашаетесь на обработку персональных данных в соответствии
+							<a href="#" class="cake_grey fs_15">с политикой конфиденциальности</a>.
+						</p>
 						<div class="row mt-3">
 							<div class="col-12 col-md-6 d-flex flex-column align-items-center align-items-md-end mt-3 mt-md-0">
 								<div class="d-flex">
@@ -63,8 +102,8 @@
 								<button onclick="window.location.href='https://auth.robokassa.ru/Merchant/Index.aspx?MerchantLogin=tortiru&Culture=ru&Encoding=utf-8&OutSum={{ cost }}&shp_interface=link&SignatureValue={{ signature }}';" type="submit" class="btn btn_hover text-white rounded-pill mt-3 px-5 shadow-none cake__button cake__bg_pink">Оплатить</button>
 							</div>
 						</div>
-					</div>
-				</v-form>
+					</v-form>
+				{% endif %}
 			</section>
 		</article>
 	</div>
